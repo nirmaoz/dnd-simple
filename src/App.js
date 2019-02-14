@@ -1,28 +1,49 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { PureComponent } from "react";
+import { TaskList } from "./Components";
+import initialState from "./appInitialState";
 
-class App extends Component {
+class App extends PureComponent {
+  // Set initial state
+  constructor(props) {
+    super(props);
+    this.state = initialState;
+    this.onDrop = this.onDrop.bind(this);
+  }
+
+  // Move task when dropped
+  onDrop(item, targetId) {
+    this.setState(state => {
+      return {
+        tasks: [
+          ...state.tasks.filter(task => task.id !== item.id),
+          { ...item, listId: targetId }
+        ]
+      };
+    });
+  }
+
+  // Render each list
+  renderLists() {
+    const { lists, tasks } = this.state;
+    return lists.map(list => (
+      <TaskList
+        key={list}
+        id={list}
+        tasks={tasks.filter(t => t.listId === list)}
+        onDrop={this.onDrop}
+      />
+    ));
+  }
+
+  // Render App
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div style={{ display: "flex", minHeight: "200px" }}>
+        {this.renderLists()}
       </div>
     );
   }
 }
 
 export default App;
+
